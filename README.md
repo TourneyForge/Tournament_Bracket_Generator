@@ -1,7 +1,7 @@
 ## Installation & updates
 
 Clone the repository
-`git clone https://github.com/StarEngineer89/ci_tournament_bracket-generator` then `composer update`
+`git clone https://github.com/TourneyForge/Tournament_Bracket_Generator.git` then `composer update`
 
 When updating, check the release notes to see if there are any changes you might need to apply
 to your `app` folder. The affected files can be copied or merged from
@@ -254,9 +254,9 @@ Set the configuration variables in `App\Config\Email.php` or `.env` file.
 
 If you send the emails through the smtp protocol, set the following variables in the .
 
-> `public string $fromEmail = "contact@tourncreator.com"`
+> `public string $fromEmail = "info@tourneyforge.com"`
 
-> `public string $fromName = "Tourn Creator"`
+> `public string $fromName = "Tourney Forge"`
 
 > `public string $protocol = 'smtp'`
 
@@ -270,9 +270,9 @@ If you send the emails through the smtp protocol, set the following variables in
 
 or (.env file)
 
-> `Email.fromEmail = "contact@tourncreator.com"`
+> `Email.fromEmail = "info@tourneyforge.com"`
 
-> `Email.fromName = "Tourn Creator"`
+> `Email.fromName = "Tourney Forge"`
 
 > `Email.protocol = 'smtp'`
 
@@ -288,9 +288,9 @@ If you use the SendGrid API to send the emails,
 
 (in App\Config\Email.php)
 
-> `public string $fromEmail = "contact@tourncreator.com"`
+> `public string $fromEmail = "info@tourneyforge.com"`
 
-> `public string $fromName = "Tourn Creator"`
+> `public string $fromName = "Tourney Forge"`
 
 > `public string $protocol = sendgrid`
 
@@ -298,9 +298,9 @@ If you use the SendGrid API to send the emails,
 
 (in .env)
 
-> `Email.fromEmail = "contact@tourncreator.com"`
+> `Email.fromEmail = "info@tourneyforge.com"`
 
-> `Email.fromName = "Tourn Creator"`
+> `Email.fromName = "Tourney Forge"`
 
 > `Email.protocol = sendgrid`
 
