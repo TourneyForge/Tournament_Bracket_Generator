@@ -58,7 +58,7 @@ document.querySelector('.teleport').addEventListener('click', function(e) {
 <?= $this->section('main') ?>
 <div class="container-fluid align-middle">
     <div class="home-title row d-flex justify-content-center text-center p-3">
-        <h1 class="p-3"><strong>Welcome to TournCreator</strong></h1>
+        <h1 class="p-3"><strong>Welcome to TourneyForge</strong></h1>
         <p>Where Competition Meets Creativity!</p>
     </div>
 

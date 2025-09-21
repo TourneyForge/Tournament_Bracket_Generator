@@ -13,7 +13,7 @@
         <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Hi <?= esc($username) ?>,</p>
-    <p>It’s been a long time since we last saw you on <strong><a href="<?= base_url() ?>">Tourn Creator</a></strong>, and we don’t want you to miss out on all the exciting things happening!</p>
+    <p>It’s been a long time since we last saw you on <strong><a href="<?= base_url() ?>">TourneyForge</a></strong>, and we don’t want you to miss out on all the exciting things happening!</p>
 
     <p>
         🔥 Forge new tournaments, customize your brackets, and jump back into the competition.<br />

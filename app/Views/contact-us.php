@@ -9,9 +9,9 @@
 <?= $this->section('main') ?>
 <div class="container-fluid align-middle p-5">
     <div class="row mt-3">
-        <h3 class="text-center">Join the TournCreator Community!</h3>
+        <h3 class="text-center">Join the TourneyForge Community!</h3>
         <h5 class="text-center mb-4">We believe tournaments should be fun, easy, and accessible to everyone.</h5>
-        <p class="text-center mb-5">Whether you're a casual organizer or a spectator, TournCreator equips you with everything you need to engage with exciting, well-managed competitions!</p>
+        <p class="text-center mb-5">Whether you're a casual organizer or a spectator, TourneyForge equips you with everything you need to engage with exciting, well-managed competitions!</p>
     </div>
 
     <div class="accordion" id="accordionAboutUs">
@@ -160,7 +160,7 @@
         <div class="col-12">
             <h3 class="text-center">Need Help? We're Here for You!</h3>
             <p><strong>Have questions or need assistance?</strong></p>
-            <p>Contact us at <a href="mailto:contact@tourncreator.com">contact@tourncreator.com</a>, and we’ll be happy to help!</p>
+            <p>Contact us at <a href="mailto:info@tourneyforge.com">info@tourneyforge.com</a>, and we’ll be happy to help!</p>
             <p>Please make sure you provide as much details as possible to ensure your request is clear for us.</p>
         </div>
     </div>

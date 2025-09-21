@@ -13,7 +13,7 @@
         <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Hi <?= esc($username) ?>,</p>
-    <p>It’s been a while since you last visited <strong><a href="<?= base_url() ?>">Tourn Creator</a></strong>, and we miss you! 🚀</p>
+    <p>It’s been a while since you last visited <strong><a href="<?= base_url() ?>">TourneyForge</a></strong>, and we miss you! 🚀</p>
 
     <p>New tournaments are happening, and your next competition could be just around the corner.</p>
 
@@ -29,7 +29,7 @@
 
     <p>Your next big moment is waiting—jump back in and experience the action!</p>
 
-    <p>👉 Visit <a href="<?= base_url() ?>">Tourn Creator</a> Now</p>
+    <p>👉 Visit <a href="<?= base_url() ?>">TourneyForge</a> Now</p>
 
     <p>See you in the arena!</p>
 
