@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 325" id="svg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="redGradient">
+            <stop offset="0%" stop-color="rgba(255, 0, 0, 0.6)" />
+            <stop offset="50%" stop-color="rgba(0, 0, 0, 0.6)" />
+        </linearGradient>
+        <linearGradient id="yellowGradient" gradientTransform="rotate(90)">
+            <stop offset="0%" stop-color="#e1a588" />
+            <stop offset="50%" stop-color="#f1e9a7" />
+            <stop offset="100%" stop-color="#e1a588" />
+        </linearGradient>
+    </defs>
+
+    <g id="splines">
+        <rect x="512.5" y="27.5" height="260" width="35" fill="url(#yellowGradient)" />
+        <rect x="582.5" y="0" height="370" width="40" fill="url(#yellowGradient)" />
+        <rect x="652.5" y="27.5" height="260" width="35" fill="url(#yellowGradient)" />
+    </g>
+
+    <rect x="0" y="142.5" height="80" width="1200" fill="rgba(255, 255, 255, 0.3)" />
+    <rect x="150" y="132.5" height="100" width="900" fill="rgba(255, 255, 255, 0.3)" />
+    <rect x="225" y="102.5" height="140" width="750" fill="rgba(0, 0, 0, 0.3)" />
+    <rect x="275" y="110" height="125" width="650" fill="url(#redGradient)" />
+    <rect x="437.5" y="67.5" height="35" width="325" fill="rgba(0, 0, 0, 0.3)" />
+
+    <g fill="rgba(255, 255, 255, 1)">
+        <rect x="210" y="122" height="4" width="130" />
+        <rect x="210" y="126" height="4" width="600" />
+    </g>
+
+    <g fill="rgba(255, 255, 255, 1)">
+        <rect x="390" y="223" height="4" width="600" />
+        <rect x="860" y="227" height="4" width="130" />
+    </g>
+
+    <text x="50%" y="65%" font-size="48px" font-family="Apex" fill="white" text-anchor="middle">CHAMPION</text>
+    
+    <style>
+        #svg {
+            transform: skew(30deg);
+            transform-origin: center;
+        }
+        text {
+            transform: skew(-30deg);
+            transform-origin: center;
+            text-anchor: middle;
+            transform-origin: 50% 50%;
+        }
+        
+    </style>
+</svg>
