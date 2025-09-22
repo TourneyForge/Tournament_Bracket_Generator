@@ -381,11 +381,15 @@ let stopAudioPlaying = () => {
     const audio = document.getElementById('myAudio');
 
     if (audio.paused) {
-        audio.play();
-        document.getElementById('stopAudioButton').textContent = "Pause Audio"
+        audio.play().then(() => {
+            document.getElementById('stopAudioButton').textContent = "Pause Audio";
+        }).catch((error) => {
+            console.log('Audio play failed:', error);
+            document.getElementById('stopAudioButton').textContent = "Start Audio";
+        });
     } else {
         audio.pause();
-        document.getElementById('stopAudioButton').textContent = "Resume Audio"
+        document.getElementById('stopAudioButton').textContent = "Resume Audio";
     }
 }
 

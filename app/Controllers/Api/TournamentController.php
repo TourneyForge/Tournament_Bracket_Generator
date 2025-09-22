@@ -738,17 +738,31 @@ class TournamentController extends BaseController
         $uploadConfig = new UploadConfig();
 
         parse_str(parse_url($youtubeLink, PHP_URL_QUERY), $vars);
+        $video_id = null;
 
         if (isset($vars['v'])) {
             $video_id = $vars['v'];
+        } elseif (isset($vars['si'])) {
+            $video_id = $vars['si'];
+        } else {
+            // Try to extract video ID from different YouTube URL formats
+            if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/', $youtubeLink, $matches)) {
+                $video_id = $matches[1];
+            }
         }
 
-        if (isset($vars['si'])) {
-            $video_id = $vars['si'];
+        if (!$video_id) {
+            throw new \Exception("Could not extract video ID from YouTube URL: " . $youtubeLink);
         }
 
         $yt = new YoutubeDl();
-        $yt->setBinPath($uploadConfig->ffmpegPath . 'bin\yt-dlp.exe');
+        $ytDlpPath = $uploadConfig->ffmpegPath . 'yt-dlp';
+        
+        if (!file_exists($ytDlpPath)) {
+            throw new \Exception("yt-dlp binary not found at: " . $ytDlpPath);
+        }
+        
+        $yt->setBinPath($ytDlpPath);
         if ($type == 'audio') {
             if (file_exists(WRITEPATH . "uploads/$uploadConfig->urlAudioUploadPath/" . $video_id . '.mp3')) {
                 return $video_id . '.mp3';
@@ -785,7 +799,8 @@ class TournamentController extends BaseController
 
         foreach ($collection->getVideos() as $video) {
             if ($video->getError() !== null) {
-                echo "Error downloading video: {$video->getError()}.";
+                log_message('error', "Error downloading video: {$video->getError()}");
+                throw new \Exception("Error downloading video: {$video->getError()}");
             }
         }
 

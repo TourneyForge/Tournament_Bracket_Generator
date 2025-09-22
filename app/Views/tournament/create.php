@@ -330,27 +330,106 @@ $(document).ready(function() {
              */
             if (tournament && tournament.audio) {
                 if (tournament.audio[0]) {
+                    audio.src = '/uploads/' + tournament.audio[0].path;
                     audio.load();
-                    audio.currentTime = parseInt(tournament.audio[0].start);
-                    audio.src = '/uploads/' + tournament.audio[0].path
-                    audio.play()
+                    
+                    // Remove any existing event listeners to prevent duplicates
+                    audio.removeEventListener('loadedmetadata', setAudioTime);
+                    audio.removeEventListener('canplay', playAudio);
+                    
+                    function setAudioTime() {
+                        audio.currentTime = parseInt(tournament.audio[0].start);
+                    }
+                    
+                    function playAudio() {
+                        audio.play().then(() => {
+                            console.log('Audio playback started successfully');
+                        }).catch((error) => {
+                            console.log('Audio autoplay was prevented, requiring user interaction:', error);
+                            document.getElementById('stopAudioButton').textContent = "Start Audio";
+                            document.getElementById('stopAudioButton').onclick = function() {
+                                audio.play().then(() => {
+                                    document.getElementById('stopAudioButton').textContent = "Pause Audio";
+                                    document.getElementById('stopAudioButton').onclick = function() {
+                                        stopAudioPlaying();
+                                    };
+                                });
+                            };
+                        });
+                    }
+                    
+                    // Wait for the audio to load before setting currentTime and playing
+                    audio.addEventListener('loadedmetadata', setAudioTime);
+                    audio.addEventListener('canplay', playAudio);
+                    
                     shuffle_duration = parseInt(tournament.audio[0].duration);
-
+                    document.getElementById('stopAudioButton').classList.remove('d-none');
+                } else if (audio.dataset.path) {
+                    // Fallback to data attribute if tournament.audio is not available
+                    audio.src = '/uploads/' + audio.dataset.path;
+                    audio.load();
+                    
+                    function setFallbackAudioTime() {
+                        audio.currentTime = parseInt(audio.dataset.starttime || 0);
+                    }
+                    
+                    function playFallbackAudio() {
+                        audio.play().then(() => {
+                            console.log('Audio playback started successfully');
+                        }).catch((error) => {
+                            console.log('Audio autoplay was prevented, requiring user interaction:', error);
+                            document.getElementById('stopAudioButton').textContent = "Start Audio";
+                            document.getElementById('stopAudioButton').onclick = function() {
+                                audio.play().then(() => {
+                                    document.getElementById('stopAudioButton').textContent = "Pause Audio";
+                                    document.getElementById('stopAudioButton').onclick = function() {
+                                        stopAudioPlaying();
+                                    };
+                                });
+                            };
+                        });
+                    }
+                    
+                    audio.addEventListener('loadedmetadata', setFallbackAudioTime);
+                    audio.addEventListener('canplay', playFallbackAudio);
+                    
+                    shuffle_duration = parseInt(audio.dataset.duration || 10);
                     document.getElementById('stopAudioButton').classList.remove('d-none');
                 }
 
                 /** Video player setting */
                 if (tournament.audio[2]) {
-                    videoPlayer.classList.remove('d-none')
-                    videoPlayer.currentTime = parseInt(tournament.audio[2].start);
-                    videoPlayer.src = '/uploads/' + tournament.audio[2].path
-                    videoPlayer.play()
+                    videoPlayer.classList.remove('d-none');
+                    videoPlayer.src = '/uploads/' + tournament.audio[2].path;
+                    videoPlayer.load();
+                    
+                    function setVideoTime() {
+                        videoPlayer.currentTime = parseInt(tournament.audio[2].start);
+                    }
+                    
+                    function playVideo() {
+                        videoPlayer.play().then(() => {
+                            console.log('Video playback started successfully');
+                        }).catch((error) => {
+                            console.log('Video autoplay was prevented, requiring user interaction:', error);
+                            document.getElementById('stopVideoButton').textContent = "Start Video";
+                            document.getElementById('stopVideoButton').onclick = function() {
+                                videoPlayer.play().then(() => {
+                                    document.getElementById('stopVideoButton').textContent = "Pause Video";
+                                    document.getElementById('stopVideoButton').onclick = function() {
+                                        stopVideoPlaying();
+                                    };
+                                });
+                            };
+                        });
+                    }
+                    
+                    // Wait for the video to load before setting currentTime and playing
+                    videoPlayer.addEventListener('loadedmetadata', setVideoTime);
+                    videoPlayer.addEventListener('canplay', playVideo);
+                    
                     shuffle_duration = parseInt(tournament.audio[2].duration);
-
                     document.getElementById('stopVideoButton').classList.remove('d-none');
-                    document.getElementById('stopVideoButton').addEventListener('click', function() {
-                        stopVideoPlaying()
-                    });
                 }
             }
 
@@ -1491,12 +1570,10 @@ var performReuseParticipants = (reuse_id = null) => {
 </div>
 
 <?php if (isset($tournament['audio']) && isset($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION])) : ?>
-<audio id="myAudio" preload="auto" data-starttime="<?= ($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['start']) ? $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['start'] : '' ?>" data-duration="<?= ($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['duration']) ? $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['duration'] : '' ?>">
-    <source src="<?= ($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['source'] == 'f') ? '/uploads/' . $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['path'] : '/uploads/' . $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['path'] ?>" type="audio/mpeg" id="audioSrc">
+<audio id="myAudio" preload="auto" data-starttime="<?= ($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['start']) ? $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['start'] : '' ?>" data-duration="<?= ($tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['duration']) ? $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['duration'] : '' ?>" data-path="<?= $tournament['audio'][AUDIO_TYPE_BRACKET_GENERATION]['path'] ?>">
 </audio>
 <?php else : ?>
 <audio id="myAudio" preload="auto">
-    <source src="" type="audio/mpeg" id="audioSrc">
 </audio>
 <?php endif; ?>
 
