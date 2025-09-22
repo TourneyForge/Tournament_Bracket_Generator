@@ -14,5 +14,5 @@ class UploadConfig extends BaseConfig
     public $participantImagesUploadPath = 'images/participants/';
     public $groupImagesUploadPath = 'images/groups/';
     public $csvUploadPath = 'CSV/UserLocal/';
-    public $ffmpegPath = 'C:\\ffmpeg\\';
+    public $ffmpegPath = '/opt/homebrew/bin/ffmpeg';
 }
