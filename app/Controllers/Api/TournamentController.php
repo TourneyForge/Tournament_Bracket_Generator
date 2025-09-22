@@ -736,6 +736,7 @@ class TournamentController extends BaseController
     public function process($youtubeLink, $type = 'audio')
     {
         $uploadConfig = new UploadConfig();
+        $filetype = ($type == 'audio') ? '.mp3' : '.mp4';
 
         parse_str(parse_url($youtubeLink, PHP_URL_QUERY), $vars);
         $video_id = null;
@@ -778,8 +779,6 @@ class TournamentController extends BaseController
                     ->url($youtubeLink)
                     ->cookies($uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt')
             );
-
-            $filetype = '.mp3';
         } else {
             if (file_exists(WRITEPATH . "uploads/$uploadConfig->urlVideoUploadPath/" . $video_id . '.mp4')) {
                 return $video_id . '.mp4';
@@ -793,8 +792,6 @@ class TournamentController extends BaseController
                     ->url($youtubeLink)
                     ->cookies($uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt')
             );
-
-            $filetype = '.mp4';
         }
 
         foreach ($collection->getVideos() as $video) {
