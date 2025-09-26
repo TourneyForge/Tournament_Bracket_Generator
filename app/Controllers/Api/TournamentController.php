@@ -5,8 +5,6 @@ namespace App\Controllers\Api;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Files\File;
-use YoutubeDl\YoutubeDl;
-use YoutubeDl\Options;
 use App\Services\NotificationService;
 use App\Libraries\VoteLibrary;
 use App\Libraries\TournamentLibrary;
@@ -741,10 +739,9 @@ class TournamentController extends BaseController
         parse_str(parse_url($youtubeLink, PHP_URL_QUERY), $vars);
         $video_id = null;
 
+        // First try to extract from query parameter 'v'
         if (isset($vars['v'])) {
             $video_id = $vars['v'];
-        } elseif (isset($vars['si'])) {
-            $video_id = $vars['si'];
         } else {
             // Try to extract video ID from different YouTube URL formats
             if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/', $youtubeLink, $matches)) {
@@ -753,52 +750,90 @@ class TournamentController extends BaseController
         }
 
         if (!$video_id) {
+            log_message('error', "Failed to extract video ID from YouTube URL: " . $youtubeLink);
             throw new \Exception("Could not extract video ID from YouTube URL: " . $youtubeLink);
         }
+        
+        log_message('info', "Extracted video ID {$video_id} from URL: {$youtubeLink}");
 
-        $yt = new YoutubeDl();
         $ytDlpPath = $uploadConfig->ffmpegPath . 'yt-dlp';
+        $cookiesPath = $uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt';
         
         if (!file_exists($ytDlpPath)) {
             throw new \Exception("yt-dlp binary not found at: " . $ytDlpPath);
         }
         
-        $yt->setBinPath($ytDlpPath);
+        if (!file_exists($cookiesPath)) {
+            throw new \Exception("Cookies file not found at: " . $cookiesPath);
+        }
+        
         if ($type == 'audio') {
-            if (file_exists(WRITEPATH . "uploads/$uploadConfig->urlAudioUploadPath/" . $video_id . '.mp3')) {
+            $outputPath = WRITEPATH . "uploads/" . $uploadConfig->urlAudioUploadPath;
+            $outputFile = $outputPath . $video_id . '.mp3';
+            
+            if (file_exists($outputFile)) {
                 return $video_id . '.mp3';
             }
 
-            $collection = $yt->download(
-                Options::create()
-                    ->downloadPath(WRITEPATH . "uploads/$uploadConfig->urlAudioUploadPath")
-                    ->extractAudio(true)
-                    ->audioFormat('mp3')
-                    ->audioQuality('0') // best
-                    ->output($video_id)
-                    ->url($youtubeLink)
-                    ->cookies($uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt')
+            // Ensure output directory exists
+            if (!is_dir($outputPath)) {
+                mkdir($outputPath, 0755, true);
+            }
+
+            // Build yt-dlp command for audio
+            $command = sprintf(
+                '%s --cookies %s --ffmpeg-location %s -x --audio-format mp3 -o %s %s',
+                escapeshellarg($ytDlpPath),
+                escapeshellarg($cookiesPath),
+                escapeshellarg($uploadConfig->ffmpegPath),
+                escapeshellarg($outputPath . $video_id . '.%(ext)s'),
+                escapeshellarg($youtubeLink)
             );
         } else {
-            if (file_exists(WRITEPATH . "uploads/$uploadConfig->urlVideoUploadPath/" . $video_id . '.mp4')) {
+            $outputPath = WRITEPATH . "uploads/" . $uploadConfig->urlVideoUploadPath;
+            $outputFile = $outputPath . $video_id . '.mp4';
+            
+            if (file_exists($outputFile)) {
                 return $video_id . '.mp4';
             }
 
-            $collection = $yt->download(
-                Options::create()
-                    ->downloadPath(WRITEPATH . "uploads/$uploadConfig->urlVideoUploadPath")
-                    ->format('mp4')
-                    ->output($video_id . '.mp4')
-                    ->url($youtubeLink)
-                    ->cookies($uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt')
+            // Ensure output directory exists
+            if (!is_dir($outputPath)) {
+                mkdir($outputPath, 0755, true);
+            }
+
+            // Build yt-dlp command for video
+            $command = sprintf(
+                '%s --cookies %s --ffmpeg-location %s --format mp4 -o %s %s',
+                escapeshellarg($ytDlpPath),
+                escapeshellarg($cookiesPath),
+                escapeshellarg($uploadConfig->ffmpegPath),
+                escapeshellarg($outputPath . $video_id . '.%(ext)s'),
+                escapeshellarg($youtubeLink)
             );
         }
 
-        foreach ($collection->getVideos() as $video) {
-            if ($video->getError() !== null) {
-                log_message('error', "Error downloading video: {$video->getError()}");
-                throw new \Exception("Error downloading video: {$video->getError()}");
-            }
+        // Execute the command
+        log_message('info', "Executing yt-dlp command for video ID {$video_id}: " . $command);
+        $output = [];
+        $returnCode = 0;
+        exec($command . ' 2>&1', $output, $returnCode);
+        
+        if ($returnCode !== 0) {
+            $errorMsg = implode("\n", $output);
+            log_message('error', "yt-dlp error for video ID {$video_id}: " . $errorMsg);
+            throw new \Exception("Error downloading video: " . $errorMsg);
+        } else {
+            log_message('info', "yt-dlp download successful for video ID {$video_id}");
+        }
+        
+        // Verify the file was created
+        $expectedFile = ($type == 'audio') ? 
+            $outputPath . $video_id . '.mp3' : 
+            $outputPath . $video_id . '.mp4';
+            
+        if (!file_exists($expectedFile)) {
+            throw new \Exception("Downloaded file not found at expected location: " . $expectedFile);
         }
 
         return $video_id . $filetype;
