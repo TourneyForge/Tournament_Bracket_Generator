@@ -790,6 +790,10 @@ class BracketsController extends BaseController
         $list = $this->request->getPost('list');
         $hash = $this->request->getPost('hash');
         
+        // Debug logging
+        log_message('info', "Generate brackets called with list: " . json_encode($list));
+        log_message('info', "Tournament ID: " . $this->request->getPost('tournament_id'));
+        
         if ($notAllowedList = $this->request->getPost('notAllowedList')) {
             foreach ($notAllowedList as $item) {
                 $this->tournamentMembersModel->delete($item);
@@ -801,12 +805,23 @@ class BracketsController extends BaseController
 
         $user_id = auth()->user() ? auth()->user()->id : 0;
 
+        /** Disable foreign key check for guest users */
+        if (!$user_id) {
+            helper('db_helper');
+            disableForeignKeyCheck();
+        }
+
         $min_count = 2;
         if ($this->request->getPost('type') == TOURNAMENT_TYPE_KNOCKOUT) {
             $min_count = 4;
         }
 
         if (count($list) < $min_count) {
+            /** Re-enable foreign key check before early return */
+            if (!$user_id) {
+                enableForeignKeyCheck();
+            }
+            
             $message = "There should be at least $min_count or more participants.";
             return $this->response->setStatusCode(ResponseInterface::HTTP_OK)
                               ->setJSON(['status' => 'error', 'message' => $message]);
@@ -819,6 +834,12 @@ class BracketsController extends BaseController
             foreach($list as $item) {
                 if (isset($item['is_group']) && $item['is_group'] && count($item['members'])) {
                     $participant = $this->participantsModel->where('group_id', $item['id'])->first();
+
+                    if ($participant === null) {
+                        log_message('error', "Group participant not found for group_id: {$item['id']}");
+                        // Skip this group since the participant record doesn't exist
+                        continue;
+                    }
 
                     $item['id'] = $participant['id'];
 
@@ -833,16 +854,51 @@ class BracketsController extends BaseController
             // Generate the string for searchable field
             foreach ($all_participants as $item) {
                 $member = $this->tournamentMembersModel->asObject()->where(['tournament_id' => $tournament_id, 'participant_id' => $item['id']])->first();
-                $member->order = $item['order'];
+                
+                if ($member === null) {
+                    log_message('warning', "Tournament member not found for tournament_id: {$tournament_id}, participant_id: {$item['id']} - creating missing record");
+                    
+                    // Check if the participant actually exists
+                    $participant = $this->participantsModel->asObject()->find($item['id']);
+                    if ($participant === null) {
+                        log_message('error', "Participant not found with id: {$item['id']} - skipping");
+                        continue;
+                    }
+                    
+                    // Create the missing tournament member record
+                    $memberData = [
+                        'tournament_id' => $tournament_id,
+                        'participant_id' => $item['id'],
+                        'order' => $item['order'] ?? 0,
+                        'created_by' => $user_id,
+                        'hash' => $hash
+                    ];
+                    
+                    $memberId = $this->tournamentMembersModel->insert($memberData);
+                    if ($memberId) {
+                        // Retrieve the newly created member record
+                        $member = $this->tournamentMembersModel->asObject()->find($memberId);
+                        log_message('info', "Created missing tournament member record with ID: {$memberId}");
+                    } else {
+                        log_message('error', "Failed to create tournament member record for participant_id: {$item['id']}");
+                        continue;
+                    }
+                }
+                
+                $member->order = $item['order'] ?? 0;
                 $this->tournamentMembersModel->save($member);
 
-                $participant = $this->participantsModel->asObject()->find($item['id']);
-                $participant_name = $participant->name;
-                if ($participant_name[0] == '@') {
-                    $participant_name = trim($participant_name, '@');
+                // Get participant info for search string - we already checked this exists above
+                if ($member->id) {
+                    $participant = $this->participantsModel->asObject()->find($item['id']);
+                    if ($participant) {
+                        $participant_name = $participant->name;
+                        if (isset($participant_name[0]) && $participant_name[0] == '@') {
+                            $participant_name = trim($participant_name, '@');
+                        }
+                        $participant_names_string .= $participant_name .',';
+                    }
                 }
-
-                $participant_names_string .= $participant_name .',';
             }
         }
         
@@ -916,6 +972,11 @@ class BracketsController extends BaseController
                     $email->clear();
                 }
             }
+        }
+
+        /** Re-enable foreign key check for guest users */
+        if (!$user_id) {
+            enableForeignKeyCheck();
         }
 
         return $this->response->setJSON(['result' => 'success', 'brackets' => $brackets, 'request' => $this->request->getPost()]);
