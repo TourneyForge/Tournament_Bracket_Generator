@@ -1,5 +1,6 @@
 ## Installation & updates
 
+
 Clone the repository
 `git clone https://github.com/TourneyForge/Tournament_Bracket_Generator.git` then `composer update`
 
