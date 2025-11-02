@@ -145,7 +145,7 @@ $routes->get('auth/resend-verification', 'Auth\RegisterController::resendVerific
 $routes->get('auth/a/abort-verification', 'Auth\RegisterController::abortVerification');
 $routes->post('register', 'Auth\RegisterController::registerAction');
 $routes->get('auth/verification-success', function () {
-    return view('shield/verification_success');
+    return view('Shield/verification_success');
 });
 
 /** Shield routs for authentication */
