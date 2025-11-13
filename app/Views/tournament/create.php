@@ -68,7 +68,8 @@ $(window).on('load', function() {
 });
 $(document).ready(function() {
     if (tournament) {
-        document.querySelector('.card-title .tournament-name').textContent = tournament.name
+        // document.querySelector('.card-title .tournament-name').textContent = tournament.name
+        document.querySelector('.card-title').textContent = tournament.name
         loadParticipants()
     }
 
