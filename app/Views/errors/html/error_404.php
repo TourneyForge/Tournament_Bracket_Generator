@@ -183,8 +183,8 @@
 
         <div class="footer-copy border-top p-3">
             <div class="container text-center">
-                copyright ©️ 2025
             </div>
+		Copyright &copy; <?= date('Y') ?>
         </div>
     </main>
 
@@ -212,7 +212,7 @@
     <script type="text/javascript">
     let apiURL = "<?= base_url('api') ?>";
 
-    var defaultTimezone = '<?= user_timezone() ?>';
+    var defaultTimezone = '<?= function_exists('user_timezone') ? user_timezone() : 'UTC' ?>';
     $(document).ready(function() {
         const timezoneSelect = $('#timezone');
         timezoneSelect.val(defaultTimezone);

@@ -168,7 +168,7 @@
 
         <div class="footer-copy border-top p-3">
             <div class="container text-center">
-                copyright ©️ 2025
+		Copyright &copy; <?= date('Y') ?>
             </div>
         </div>
     </main>
