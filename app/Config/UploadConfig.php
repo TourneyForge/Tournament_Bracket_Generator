@@ -14,5 +14,8 @@ class UploadConfig extends BaseConfig
     public $participantImagesUploadPath = 'images/participants/';
     public $groupImagesUploadPath = 'images/groups/';
     public $csvUploadPath = 'CSV/UserLocal/';
-    public $ffmpegPath = '/opt/homebrew/bin/';
+    public $ffmpegPath = '/usr/bin/';
+    public $denoPath = '/usr/local/bin/deno';
+    public $ytdlpPath = '/usr/local/bin/';
+    public $cookiesPath = '';
 }

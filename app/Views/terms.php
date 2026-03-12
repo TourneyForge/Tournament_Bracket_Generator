@@ -47,17 +47,28 @@
             <p>We reserve the right to suspend or delete accounts and tournaments that violate these guidelines.</p>
 
             <p class="mt-3"><strong>6. Privacy and Data Usage</strong></p>
-            <p class="mb-1 ps-2">✔ <strong>We value your privacy!</strong></p>
-            <p class="mb-1 ps-2">By using the site, you consent to limited data collection necessary for tournament functionality, such as participant records and leaderboard rankings.</p>
-            <p class="mb-1 ps-2">✔ <strong>Guest Users</strong></p>
-            <p class="mb-1 ps-2">Please note that tournament data created by guest users is temporary and may not be permanently stored unless claimed by or linked to a registered account.</p>
-            <p class="mb-1 ps-2">✔ <strong>Your Privacy Controls</strong></p>
-            <p class="mb-1 ps-2">
-                We provide tools to help you manage your privacy at any time from your Profile Settings:<br />
-            <p class="mb-0 ps-3">• <strong>Reset Cookie Preferences:</strong> Revisit and modify your cookie consent choices.</p>
-            <p class="mb-0 ps-3">• <strong>Email Privacy:</strong> Choose to hide your email address from tournaments and participant leaderboards.</p>
-            <p class="mb-0 ps-3">• <strong>Account Deletion:</strong> You may delete your account permanently at any time.</p>
-            </p>
+
+            <p class="mb-1 ps-2"><strong>Data We Access:</strong> When you sign in with Google we request only the Google <em>profile</em> and <em>email</em> scopes. This allows us to access your basic Google account profile information (such as your name and profile picture URL) and your verified email address. We do not request or access other Google APIs or sensitive data (calendars, contacts, Drive files, etc.).</p>
+
+            <p class="mb-1 ps-2"><strong>How We Use Google Data:</strong> We use the Google profile and email solely to create and/or authenticate your TourneyForge account, populate your display name and avatar, and send important account-related messages (for example, notifications or account recovery emails such as password resets). We do not use Google account data for profiling beyond basic account operation.</p>
+
+            <p class="mb-1 ps-2"><strong>Tokens and Storage:</strong> We use OAuth only to obtain the profile information described above. We do not persist Google access or refresh tokens in our database. The only Google-derived data we store long-term is your email address, display name, and avatar URL (if you choose to save it) as part of your user profile.</p>
+
+            <p class="mb-1 ps-2"><strong>Data Sharing:</strong> We do not sell or rent your Google account data. We may share user data with trusted third-party service providers who perform services on our behalf (for example: hosting, email delivery, analytics, or payment processors). Any such providers are contractually required to use data only to provide the service and to protect it. We may also disclose data if required by law, court order, or to prevent fraud or imminent harm.</p>
+
+            <p class="mb-1 ps-2"><strong>Data Storage & Protection:</strong> We store user data in our database hosted on secure servers and protect it using industry-standard measures: TLS (HTTPS) in transit, access controls, and regular security patching. Passwords (if applicable) are hashed using strong, adaptive hashing algorithms. Access to personal data is limited to personnel and systems that need it to operate the service.</p>
+
+            <p class="mb-1 ps-2"><strong>Data Retention & Deletion:</strong></p>
+            <p class="mb-0 ps-3">• Registered user account data (including email, name, and tournaments you create) is retained until you delete your account or we remove it.</p>
+            <p class="mb-0 ps-3">• Guest-created tournaments are automatically deleted after 24 hours unless claimed by a registered account.</p>
+            <p class="mb-0 ps-3">• When you request account deletion (via Profile Settings &gt; Close Account), your account and associated personal data will be removed from active systems immediately. Backups or logs may contain residual data for operational recovery up to a certain period of time.</p>
+            <p class="mb-1 ps-2">When you request deletion, a confirmation email will be sent attesting to the completion of the deletion process.</p>
+
+            <p class="mb-1 ps-2"><strong>User Controls:</strong></p>
+            <p class="mb-0 ps-3">• Manage or remove your account data from Profile Settings (hide email, update name, close account).</p>
+            <p class="mb-0 ps-3">• To revoke TourneyForge’s access to your Google account, remove the app permission from your Google Account’s Security &gt; Third-party apps with account access page. Revoking access prevents future Google sign-ins but does not automatically delete data stored in our system—use account deletion to remove stored data.</p>
+
+            <p class="mb-1 ps-2"><strong>Contact & Data Requests:</strong> For data deletion, access requests, or privacy questions, contact us at <a href="mailto:info@tourneyforge.com">info@tourneyforge.com</a>. We will respond to verifiable requests from account owners and provide next steps or confirmation within a reasonable timeframe.</p>
 
             <p class="mt-3"><strong>7. Intellectual Property & Media Usage</strong></p>
             <p class="mb-1 ps-2">✔ TourneyForge’s software, trademarks, and design are owned by us and may not be copied, modified, or distributed without permission.</p>

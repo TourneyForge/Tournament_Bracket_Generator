@@ -10,7 +10,7 @@
 
 <body>
     <div class="logo" style="text-align: center;">
-        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
+        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.png') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Hi <?= esc($username) ?>,</p>
     <p>The sharing permissions for the tournament "<strong><a href="<?= base_url("tournaments/shared/{$share['token']}") ?>"><?= $tournament->name ?></a></strong>" privately shared with you have been updated.</p>

@@ -6,6 +6,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+cronjob.log
 
 # OS X Thumbnails
 ._*
