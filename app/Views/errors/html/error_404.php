@@ -25,7 +25,7 @@
         <div class="header border-bottom sticky-top">
             <div class="container-fluid">
                 <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary position-relative d-flex p-0">
-                    <a class="navbar-brand me-auto pe-3" href="<?= base_url() ?>"><img src="/images/logo.jpg" class="logo" /></a>
+                    <a class="navbar-brand me-auto pe-3" href="<?= base_url() ?>"><img src="/images/logo.png" class="logo" /></a>
 
                     <?php if (auth()->user() && auth()->user()->id) : ?>
                     <div class="notification-box me-3 order-lg-3">
