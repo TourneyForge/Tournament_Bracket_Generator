@@ -6,8 +6,8 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'local@tourneyforge.com';
-    public string $fromName   = 'TourneyLocal';
+    public string $fromEmail  = 'info@tourneyforge.com';
+    public string $fromName   = 'Tourney Forge';
     public string $recipients = '';
 
     /**
@@ -27,6 +27,8 @@ class Email extends BaseConfig
 
     /**
      * SMTP Server Hostname
+     * SMTP host is only used in local testing
+     * If the protocol is set to third party email provider such as sendgrid, all SMTP variables are ignored
      */
     public string $SMTPHost = 'localhost';
 
