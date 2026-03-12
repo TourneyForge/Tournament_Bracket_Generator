@@ -387,6 +387,9 @@ class TournamentController extends BaseController
                         'url' => $url
                     ];
 
+		    $db = \Config\Database::connect();
+                    $db->reconnect();
+
                     $audio_setting = $audioSettingsModel->insert($setting);
 
                     if (!$audio_setting) {
@@ -756,8 +759,8 @@ class TournamentController extends BaseController
         
         log_message('info', "Extracted video ID {$video_id} from URL: {$youtubeLink}");
 
-        $ytDlpPath = $uploadConfig->ffmpegPath . 'yt-dlp';
-        $cookiesPath = $uploadConfig->ffmpegPath . 'www.youtube.com_cookies.txt';
+	$ytDlpPath = $uploadConfig->ytdlpPath . 'yt-dlp';
+        $cookiesPath = $uploadConfig->cookiesPath;
         
         if (!file_exists($ytDlpPath)) {
             throw new \Exception("yt-dlp binary not found at: " . $ytDlpPath);
@@ -782,10 +785,11 @@ class TournamentController extends BaseController
 
             // Build yt-dlp command for audio
             $command = sprintf(
-                '%s --cookies %s --ffmpeg-location %s -x --audio-format mp3 -o %s %s',
+		'%s --cookies %s --ffmpeg-location %s -x --audio-format mp3 --js-runtimes deno:%s -o %s %s',
                 escapeshellarg($ytDlpPath),
                 escapeshellarg($cookiesPath),
                 escapeshellarg($uploadConfig->ffmpegPath),
+		escapeshellarg($uploadConfig->denoPath),
                 escapeshellarg($outputPath . $video_id . '.%(ext)s'),
                 escapeshellarg($youtubeLink)
             );
@@ -804,10 +808,11 @@ class TournamentController extends BaseController
 
             // Build yt-dlp command for video
             $command = sprintf(
-                '%s --cookies %s --ffmpeg-location %s --format mp4 -o %s %s',
+		'%s --cookies %s --ffmpeg-location %s -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]" --merge-output-format mp4 --js-runtimes deno:%s -o %s %s',
                 escapeshellarg($ytDlpPath),
                 escapeshellarg($cookiesPath),
                 escapeshellarg($uploadConfig->ffmpegPath),
+		escapeshellarg($uploadConfig->denoPath),
                 escapeshellarg($outputPath . $video_id . '.%(ext)s'),
                 escapeshellarg($youtubeLink)
             );
