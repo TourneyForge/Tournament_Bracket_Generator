@@ -192,7 +192,7 @@ class ParticipantsController extends BaseController
                 foreach ($groups as $group_id => $group) {
                     $group['members'] = '';
                     // Fetch the group members and plus the score and counts
-                    $members = $this->groupMembersModel->where('group_members.group_id', $group_id)->groupBy('participants.id')->details()->findAll();
+		    $members = $this->groupMembersModel->where('group_members.group_id', $group_id)->details()->findAll();
                     if ($members) {
                         foreach ($members as $index => $member) {
                             if (!$member['id']) {

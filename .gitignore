@@ -1,6 +1,7 @@
 #-------------------------
 # Operating Specific Junk Files
 #-------------------------
+cronjob.log
 
 # OS X
 .DS_Store
