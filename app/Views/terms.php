@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-12">
             <h3 class="text-center">Terms of Service & Privacy Policy</h3>
-            <p class="text-center">Last Updated: 2025-03-12</p>
+            <p class="text-center">Last Updated: 2026-03-12</p>
         </div>
     </div>
 
