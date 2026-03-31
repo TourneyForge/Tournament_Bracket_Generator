@@ -48,9 +48,14 @@ class Services extends BaseService
          if (setting('Email.protocol') == 'sendgrid') {
             $getShared = false;
          }
+
+	if (! $config) {
+		$config = config('Email');
+	}
          
          if ($getShared) {
-            return static::getSharedInstance('email');
+		$email = new \CodeIgniter\Email\Email($config);
+		return $email;
          }
 
          return new SendGridEmailService();

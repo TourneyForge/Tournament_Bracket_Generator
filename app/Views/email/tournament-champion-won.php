@@ -10,18 +10,16 @@
 
 <body>
     <div class="logo" style="text-align: center;">
-        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
+        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.png') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Hi <?= esc($username) ?>,</p>
-    <p>The tournament "<strong><a href="<?= base_url("tournaments/shared/{$share['token']}") ?>"><?= $tournament->name ?></a></strong>" has been shared with you!</p>
+    <p>🏅 Congratulations! You have won the tournament "<strong><a href="<?= base_url("tournaments/$tournament->id/view") ?>"><?= $tournament->name ?></a></strong>" hosted by <?= $creator ? "$creator->username ($creator->email)" : 'Guest' ?> and claimed the top spot! Your hard work, strategy, and skill have led you to victory.</p>
 
-    <?php $user = auth()->user() ? auth()->getProvider()->findById(auth()->user()->id) : null; ?>
-    🔹 <strong>Shared By</strong>: <?= $user ? "$user->username ($user->email)" : "Guest User" ?><br />
-    🔹 <strong>Your Role</strong>: <?= $role ?>
+    🔹 <a href="<?= base_url('participants') ?>">Check your stats on the leaderboard!</a>
 
-    <p>You may view or conduct certain actions depending on the permissions granted.</p>
+    <p>Celebrate your achievement and share your victory with others! 🏆</p>
 
-    <p>If you have any questions, please contact the tournament organizer/host. Otherwise, if you weren’t expecting this invitation, feel free to ignore it.</p>
+    <p>Thank you for participating, and we hope to see you in future tournaments!</p>
 
     <p>Best regards,</p>
     <p>🏆 <?= esc($tournamentCreatorName) ?> Team</p>

@@ -10,7 +10,7 @@
 
 <body>
     <div class="logo" style="text-align: center;">
-        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
+        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.png') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Welcome to <b><a href="<?= base_url() ?>"><?= setting('Email.fromName') ?></a></b>! Before you can start creating/administering tournaments, we need to verify your account. </p>
     <p>

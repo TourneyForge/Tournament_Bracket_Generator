@@ -10,14 +10,14 @@
 
 <body>
     <div class="logo" style="text-align: center;">
-        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.jpg') ?>" style="max-height: 120px;"></a>
+        <a href="<?= base_url() ?>"><img src="<?= base_url('images/logo.png') ?>" style="max-height: 120px;"></a>
     </div>
     <p>Hi <?= esc($username) ?>,</p>
-    <p>The tournament "<strong><a href="<?= base_url("tournaments/$tournament->id/view") ?>"><?= $tournament->name ?></a></strong>" you were participating in has been reset. This means all progress, match results, and bracket advancements have been cleared. </p>
+    <p>The availability of tournament "<strong><a href="<?= base_url("tournaments/$tournament->id/view") ?>"><?= $tournament->name ?></a></strong>" hosted by <?= $creator ? "$creator->name ($creator->email)" : 'Guest' ?> has been updated to the following new START/END Date/Time.</p>
 
-    🔹 <strong>Reset By:</strong> <?= $creator ? "$creator->username ($creator->email)" : 'Guest' ?>
+    🔹 <strong>Duration</strong>: <?= $startTime ?> - <?= $endTime ?>
 
-    <p>If you have any questions, please reach out to the tournament host.</p>
+    <p>If you have any questions about these changes, please reach out to the tournament organizer.</p>
 
     <p>Best regards,</p>
     <p>🏆 <?= esc($tournamentCreatorName) ?> Team</p>

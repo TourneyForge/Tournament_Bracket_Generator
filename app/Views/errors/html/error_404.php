@@ -25,7 +25,7 @@
         <div class="header border-bottom sticky-top">
             <div class="container-fluid">
                 <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary position-relative d-flex p-0">
-                    <a class="navbar-brand me-auto pe-3" href="<?= base_url() ?>"><img src="/images/logo.jpg" class="logo" /></a>
+                    <a class="navbar-brand me-auto pe-3" href="<?= base_url() ?>"><img src="/images/logo.png" class="logo" /></a>
 
                     <?php if (auth()->user() && auth()->user()->id) : ?>
                     <div class="notification-box me-3 order-lg-3">
@@ -183,8 +183,8 @@
 
         <div class="footer-copy border-top p-3">
             <div class="container text-center">
-                copyright ©️ 2025
             </div>
+		Copyright &copy; <?= date('Y') ?>
         </div>
     </main>
 
@@ -212,7 +212,7 @@
     <script type="text/javascript">
     let apiURL = "<?= base_url('api') ?>";
 
-    var defaultTimezone = '<?= user_timezone() ?>';
+    var defaultTimezone = '<?= function_exists('user_timezone') ? user_timezone() : 'UTC' ?>';
     $(document).ready(function() {
         const timezoneSelect = $('#timezone');
         timezoneSelect.val(defaultTimezone);
