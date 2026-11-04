@@ -10,9 +10,9 @@
         "slack": "https://codeigniterchat.slack.com"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "cboden/ratchet": "^0.4.4",
-        "codeigniter4/framework": "^4.0",
+        "codeigniter4/framework": "^4.7.4",
         "codeigniter4/shield": "^1.0",
         "google/apiclient": "^2.16",
         "google/auth": "^1.40",
@@ -44,7 +44,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3.30"
+        }
     },
     "scripts": {
         "test": "phpunit"
