@@ -292,164 +292,215 @@ class TournamentController extends BaseController
         return $this->response->setJSON($newTournaments);
     }
 
+
+    private function configureGuestDbSession(\CodeIgniter\Database\BaseConnection $db, int $userId): void
+    {
+        if (!$userId) {
+            $db->simpleQuery('SET SESSION foreign_key_checks = 0');
+        }
+    }
+    
+    private function reconnectAndConfigureGuestDb(\CodeIgniter\Database\BaseConnection $db, int $userId): void
+    {
+        $db->reconnect();
+        $this->configureGuestDbSession($db, $userId);
+    }
+    
+    private function restoreGuestDbSession(\CodeIgniter\Database\BaseConnection $db, int $userId): void
+    {
+        if (!$userId) {
+            $db->simpleQuery('SET SESSION foreign_key_checks = 1');
+        }
+    }
+
     public function save()
     {
-        helper('db_helper');
-
+        $db = \Config\Database::connect();
+    
         $tournamentModel = model('\App\Models\TournamentModel');
-        $user_id = (auth()->user()) ? auth()->user()->id : 0;
-
-        /** Disable foreign key check for the guest users */
-        if (!$user_id) {
-            disableForeignKeyCheck();
-        }
-
-        $existing = $tournamentModel->where(['name' => $this->request->getPost('title'), 'user_id' => $user_id])->findAll();
-
-        if ($existing && !$this->request->getPost('confirm_duplicate_save')) {
-            $data = ['errors' => "duplicated", 'message' => "Chosen tournament name already exists. Do you want to proceed saving anyways?"];
-
-            return $this->response->setJSON($data);
-        }
-
-        $data = [
-            'name' => $this->request->getPost('title'),
-            'user_id' => $user_id,
-            'type' => $this->request->getPost('type'),
-            'searchable' => $this->request->getPost('title'),
-            'archive' => 0,
-            'shuffle_enabled' => ($this->request->getPost('shuffle_enabled') == 'on') ? 1 : 0,
-            'description' => $this->request->getPost('description'),
-            'score_enabled' => ($this->request->getPost('score_enabled') == 'on') ? 1 : 0,
-            'score_bracket' => $this->request->getPost('score_bracket'),
-            'increment_score' => $this->request->getPost('increment_score'),
-            'increment_score_enabled' => ($this->request->getPost('increment_score_enabled') == 'on') ? 1 : 0,
-            'increment_score_type' => $this->request->getPost('increment_score_type'),
-            'visibility' => ($this->request->getPost('visibility') == 'on') ? 1 : 0,
-            'availability' => ($this->request->getPost('availability') && $this->request->getPost('availability') == 'on') ? 1 : 0,
-            'evaluation_method' => $this->request->getPost('evaluation_method'),
-            'voting_accessibility' => $this->request->getPost('voting_accessibility'),
-            'voting_mechanism' => $this->request->getPost('voting_mechanism'),
-            'max_vote_value' => $this->request->getPost('max_vote_value'),
-            'round_duration_combine' => ($this->request->getPost('round_duration_combine') == 'on') ? 1 : 0,
-            'voting_retain' => ($this->request->getPost('voting_retain') == 'on') ? 1 : 0,
-            'vote_displaying' => $this->request->getPost('vote_displaying'),
-            'allow_host_override' => ($this->request->getPost('allow_host_override') == 'on') ? 1 : 0,
-            'pt_image_update_enabled' => ($this->request->getPost('pt_image_update_enabled') == 'on') ? 1 : 0,
-            'theme' => $this->request->getPost('theme'),
-            'winner_audio_everyone' => ($this->request->getPost('winner_audio_everyone') == 'on') ? 1 : null
-        ];
-
-        if ($this->request->getPost('availability')) {
-            $data['available_start'] = date('Y-m-d H:i:s', strtotime($this->request->getPost('startAvPicker')));
-            $data['available_end'] = date('Y-m-d H:i:s', strtotime($this->request->getPost('endAvPicker')));
-
-            if ($data['available_start'] > date('Y-m-d H:i:s')) {
-                $data['status'] = TOURNAMENT_STATUS_NOTSTARTED;
+        $user_id = auth()->user() ? (int) auth()->user()->id : 0;
+    
+        // Apply session config on the initial DB session.
+        $this->configureGuestDbSession($db, $user_id);
+    
+        try {
+            $existing = $tournamentModel
+                ->where([
+                    'name'    => $this->request->getPost('title'),
+                    'user_id' => $user_id,
+                ])
+                ->findAll();
+    
+            if ($existing && !$this->request->getPost('confirm_duplicate_save')) {
+                return $this->response->setJSON([
+                    'errors'  => 'duplicated',
+                    'message' => 'Chosen tournament name already exists. Do you want to proceed saving anyways?',
+                ]);
             }
-        }
-
-        $tournamentData = new \App\Entities\Tournament($data);
-
-        $tournament_id = $tournamentModel->insert($tournamentData);
-        // End saving the tournament settings
-
-        if (!$tournament_id) {
-            $data = ['errors' => "tournament_saving", 'message' => "Failed to save the tournament."];
-
-            return $this->response->setJSON($data);
-        }
-
-        $tournamentData->id = $tournament_id;
-
-        if ($this->request->getPost('setting-toggle')) {
-            $uploadConfig = new UploadConfig();
-            $audioSettingsModel = model('\App\Models\AudioSettingModel');
-
-            foreach ($this->request->getPost('audioType') as $index => $value) {
-                if (isset($this->request->getPost('setting-toggle')[$index]) && $this->request->getPost('setting-toggle')[$index] == 'on') {
-                    if ($index == 2) {
-                        $path = ($this->request->getPost('source')[$index] == 'f') ? $this->request->getPost('file-path')[$index] : $uploadConfig->urlVideoUploadPath . $this->process($this->request->getPost('url')[$index], 'video');
-                    } else {
-                        $path = ($this->request->getPost('source')[$index] == 'f') ? $this->request->getPost('file-path')[$index] : $uploadConfig->urlAudioUploadPath . $this->process($this->request->getPost('url')[$index]);
-                    }
-                    $url = ($this->request->getPost('source')[$index] == 'f') ? null : $this->request->getPost('url')[$index];
-
-                    $setting = [
-                        'path' => $path,
-                        'source' => $this->request->getPost('source')[$index],
-                        'tournament_id' => $tournament_id,
-                        'user_id' => $user_id,
-                        'type' => $index,
-                        'duration' => $this->request->getPost('duration')[$index],
-                        'start' => $this->request->getPost('start')[$index],
-                        'end' => $this->request->getPost('stop')[$index],
-                        'url' => $url
-                    ];
-
-		    $db = \Config\Database::connect();
-                    $db->reconnect();
-
-                    $audio_setting = $audioSettingsModel->insert($setting);
-
-                    if (!$audio_setting) {
-                        $data = ['errors' => "audio_saving", 'message' => "Failed to save the audio settings."];
-
-                        return $this->response->setJSON($data);
-                    }
-
-                    $data['audio'][$index] = $setting;
+    
+            $data = [
+                'name' => $this->request->getPost('title'),
+                'user_id' => $user_id,
+                'type' => $this->request->getPost('type'),
+                'searchable' => $this->request->getPost('title'),
+                'archive' => 0,
+                'shuffle_enabled' => ($this->request->getPost('shuffle_enabled') == 'on') ? 1 : 0,
+                'description' => $this->request->getPost('description'),
+                'score_enabled' => ($this->request->getPost('score_enabled') == 'on') ? 1 : 0,
+                'score_bracket' => $this->request->getPost('score_bracket'),
+                'increment_score' => $this->request->getPost('increment_score'),
+                'increment_score_enabled' => ($this->request->getPost('increment_score_enabled') == 'on') ? 1 : 0,
+                'increment_score_type' => $this->request->getPost('increment_score_type'),
+                'visibility' => ($this->request->getPost('visibility') == 'on') ? 1 : 0,
+                'availability' => ($this->request->getPost('availability') && $this->request->getPost('availability') == 'on') ? 1 : 0,
+                'evaluation_method' => $this->request->getPost('evaluation_method'),
+                'voting_accessibility' => $this->request->getPost('voting_accessibility'),
+                'voting_mechanism' => $this->request->getPost('voting_mechanism'),
+                'max_vote_value' => $this->request->getPost('max_vote_value'),
+                'round_duration_combine' => ($this->request->getPost('round_duration_combine') == 'on') ? 1 : 0,
+                'voting_retain' => ($this->request->getPost('voting_retain') == 'on') ? 1 : 0,
+                'vote_displaying' => $this->request->getPost('vote_displaying'),
+                'allow_host_override' => ($this->request->getPost('allow_host_override') == 'on') ? 1 : 0,
+                'pt_image_update_enabled' => ($this->request->getPost('pt_image_update_enabled') == 'on') ? 1 : 0,
+                'theme' => $this->request->getPost('theme'),
+                'winner_audio_everyone' => ($this->request->getPost('winner_audio_everyone') == 'on') ? 1 : null,
+            ];
+    
+            if ($this->request->getPost('availability')) {
+                $data['available_start'] = date('Y-m-d H:i:s', strtotime($this->request->getPost('startAvPicker')));
+                $data['available_end'] = date('Y-m-d H:i:s', strtotime($this->request->getPost('endAvPicker')));
+    
+                if ($data['available_start'] > date('Y-m-d H:i:s')) {
+                    $data['status'] = TOURNAMENT_STATUS_NOTSTARTED;
                 }
             }
-        }
-
-        /**
-         * Add the tournament created by guest users to share table
-         */
-        if ($tournamentData->visibility) {
-            $shareSetting = $this->shareSettingModel->where(['tournament_id' => $tournament_id, 'user_id' => $user_id])->first();
-            if (!$shareSetting) {
-                $config = new \Config\Encryption();
-                $token = hash_hmac('sha256', 'tournament_' . $tournament_id . "_created_by_" . $user_id . "_" . time(), $config->key);
-                $token = substr($token, 0, 5);
-                $shareData = array(
-                    'user_id' => $user_id,
-                    'tournament_id' => $tournament_id,
-                    'target' => 'p',
-                    'permission' => SHARE_PERMISSION_VIEW,
-                    'token' => $token
+    
+            $tournamentData = new \App\Entities\Tournament($data);
+            $tournament_id = $tournamentModel->insert($tournamentData);
+    
+            if (!$tournament_id) {
+                return $this->response->setJSON([
+                    'errors'  => 'tournament_saving',
+                    'message' => 'Failed to save the tournament.',
+                ]);
+            }
+    
+            $tournamentData->id = $tournament_id;
+    
+            if ($this->request->getPost('setting-toggle')) {
+                $uploadConfig = new UploadConfig();
+    
+                foreach ($this->request->getPost('audioType') as $index => $value) {
+                    if (
+                        isset($this->request->getPost('setting-toggle')[$index]) &&
+                        $this->request->getPost('setting-toggle')[$index] == 'on'
+                    ) {
+                        if ($index == 2) {
+                            $path = ($this->request->getPost('source')[$index] == 'f')
+                                ? $this->request->getPost('file-path')[$index]
+                                : $uploadConfig->urlVideoUploadPath . $this->process($this->request->getPost('url')[$index], 'video');
+                        } else {
+                            $path = ($this->request->getPost('source')[$index] == 'f')
+                                ? $this->request->getPost('file-path')[$index]
+                                : $uploadConfig->urlAudioUploadPath . $this->process($this->request->getPost('url')[$index]);
+                        }
+    
+                        $url = ($this->request->getPost('source')[$index] == 'f')
+                            ? null
+                            : $this->request->getPost('url')[$index];
+    
+                        $setting = [
+                            'path' => $path,
+                            'source' => $this->request->getPost('source')[$index],
+                            'tournament_id' => $tournament_id,
+                            'user_id' => $user_id,
+                            'type' => $index,
+                            'duration' => $this->request->getPost('duration')[$index],
+                            'start' => $this->request->getPost('start')[$index],
+                            'end' => $this->request->getPost('stop')[$index],
+                            'url' => $url,
+                        ];
+    
+                        // Long media processing may have dropped the DB connection.
+                        // Reconnect, then reapply guest session config on the new session.
+                        $this->reconnectAndConfigureGuestDb($db, $user_id);
+    
+                        $audio_setting = $db->table('music_settings')->insert($setting);
+    
+                        if (!$audio_setting) {
+                            return $this->response->setJSON([
+                                'errors'  => 'audio_saving',
+                                'message' => 'Failed to save the audio settings.',
+                            ]);
+                        }
+    
+                        $data['audio'][$index] = $setting;
+                    }
+                }
+            }
+    
+            if ($tournamentData->visibility) {
+                $shareSetting = $this->shareSettingModel
+                    ->where([
+                        'tournament_id' => $tournament_id,
+                        'user_id'       => $user_id,
+                    ])
+                    ->first();
+    
+                if (!$shareSetting) {
+                    $config = new \Config\Encryption();
+                    $token = hash_hmac(
+                        'sha256',
+                        'tournament_' . $tournament_id . '_created_by_' . $user_id . '_' . time(),
+                        $config->key
+                    );
+                    $token = substr($token, 0, 5);
+    
+                    $shareData = [
+                        'user_id' => $user_id,
+                        'tournament_id' => $tournament_id,
+                        'target' => 'p',
+                        'permission' => SHARE_PERMISSION_VIEW,
+                        'token' => $token,
+                    ];
+    
+                    $this->shareSettingModel->insert($shareData);
+                }
+            }
+    
+            if (!$user_id) {
+                $existingHistory = $this->request->getCookie('guest_tournaments');
+                $tournamentHistory = $existingHistory ? json_decode($existingHistory, true) : [];
+    
+                $shareSetting = $this->shareSettingModel
+                    ->where([
+                        'tournament_id' => $tournament_id,
+                        'user_id'       => 0,
+                    ])
+                    ->first();
+    
+                if ($shareSetting) {
+                    $tournamentHistory[] = $tournament_id . '_' . $shareSetting['token'];
+                } else {
+                    $tournamentHistory[] = $tournament_id . '_guest';
+                }
+    
+                $this->response->setCookie(
+                    'guest_tournaments',
+                    json_encode($tournamentHistory),
+                    24 * 60 * 60
                 );
-                $this->shareSettingModel->insert($shareData);
             }
+    
+            $data['id'] = $tournament_id;
+    
+            return $this->response->setJSON([
+                'msg' => 'Tournament settings successfully saved.',
+                'tournament' => $data,
+            ]);
+        } finally {
+            $this->restoreGuestDbSession($db, $user_id);
         }
-
-        /** Add the tournament Id into the cookie for guest users */
-        if (!$user_id) {
-            $existingHistory = $this->request->getCookie('guest_tournaments');
-            $tournamentHistory = $existingHistory ? json_decode($existingHistory, true) : [];
-
-            $shareSetting = $this->shareSettingModel->where(['tournament_id' => $tournament_id, 'user_id' => 0])->first();
-
-            // Add the new tournament to the history
-            if ($shareSetting) {
-                $tournamentHistory[] = $tournament_id . "_" . $shareSetting['token'];
-            } else {
-                $tournamentHistory[] = $tournament_id . "_" . 'guest';
-            }
-
-            // Store updated history in cookies (expire in 1 days)
-            $this->response->setCookie('guest_tournaments', json_encode($tournamentHistory), 24 * 60 * 60);
-        }
-        /** End adding the tournament Id into the cookie for guest users */
-
-        /** Enable foreign key check */
-        if (!$user_id) {
-            enableForeignKeyCheck();
-        }
-
-        $data['id'] = $tournament_id;
-
-        return $this->response->setJSON(['msg' => "Tournament settings successfully saved.", 'tournament' => $data]);
     }
 
     public function getSettings($id)
@@ -785,9 +836,10 @@ class TournamentController extends BaseController
 
             // Build yt-dlp command for audio
             $command = sprintf(
-		'%s --cookies %s --ffmpeg-location %s -x --audio-format mp3 --js-runtimes deno:%s -o %s %s',
+		'%s --cookies %s --extractor-args %s --ffmpeg-location %s -x --audio-format mp3 --js-runtimes deno:%s -o %s %s',
                 escapeshellarg($ytDlpPath),
                 escapeshellarg($cookiesPath),
+                escapeshellarg('youtube:player_client=web'),
                 escapeshellarg($uploadConfig->ffmpegPath),
 		escapeshellarg($uploadConfig->denoPath),
                 escapeshellarg($outputPath . $video_id . '.%(ext)s'),
@@ -808,9 +860,10 @@ class TournamentController extends BaseController
 
             // Build yt-dlp command for video
             $command = sprintf(
-		'%s --cookies %s --ffmpeg-location %s -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]" --merge-output-format mp4 --js-runtimes deno:%s -o %s %s',
+		'%s --cookies %s --extractor-args %s --ffmpeg-location %s -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]" --merge-output-format mp4 --js-runtimes deno:%s -o %s %s',
                 escapeshellarg($ytDlpPath),
                 escapeshellarg($cookiesPath),
+                escapeshellarg('youtube:player_client=web'),
                 escapeshellarg($uploadConfig->ffmpegPath),
 		escapeshellarg($uploadConfig->denoPath),
                 escapeshellarg($outputPath . $video_id . '.%(ext)s'),
