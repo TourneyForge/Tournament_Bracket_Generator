@@ -64,10 +64,9 @@ Production needed this to keep downloads working from the server.
 
 ## 3. Configuration differences: set in `.env`, not in code
 
-Production had these values hardcoded in config classes. They are environment-specific,
-and one of them was a credential, so they are **not** committed. Set them in the
-server's `.env` instead. CodeIgniter overrides config properties from `.env`
-automatically.
+These values are environment-specific (one is a credential), so they belong in the
+server's `.env` rather than in a committed config class. CodeIgniter overrides config
+properties from `.env` automatically.
 
 ### Email (`app/Config/Email.php`)
 
