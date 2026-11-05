@@ -47,7 +47,7 @@ class TournamentLibrary
                     continue;
                 }
 
-                if ($participant['image']) {
+                if ($participant['image'] && file_exists(WRITEPATH . $participant['image'])) {
                     unlink(WRITEPATH . $participant['image']);
                 }
 
