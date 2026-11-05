@@ -85,9 +85,9 @@ Email.mailType    = text
 - The SMTP values are ignored when the protocol is `sendgrid`.
 - `mailType` was `text` in production but `html` on `main`. Add `Email.mailType = text`
   to `.env` if production should keep plain-text mail.
-- Production also had a SendGrid API key hardcoded as a property in `Email.php`. The code
-  never reads that property: `SendGridEmailService` and `EmailTestController` call
-  `getenv('SENDGRID_API_KEY')`. Keep the key in `.env` only, as `SENDGRID_API_KEY = ...`.
+- The SendGrid API key is read from the environment: `SendGridEmailService` and
+  `EmailTestController` call `getenv('SENDGRID_API_KEY')`. Keep the key in `.env`
+  only (`SENDGRID_API_KEY = ...`) and never hardcode it in a config class.
 
 ### YouTube cookies file (`app/Config/UploadConfig.php`)
 
@@ -109,5 +109,5 @@ direct table insert, so this branch does not cause it. Worth a separate fix.
 ## Deploying this branch to production
 
 1. Add `uploadconfig.cookiesPath` (and optionally `Email.mailType`) to the server `.env`.
-2. Remove the hardcoded `SENDGRID_API_KEY` property from the server copy of `Email.php`.
+2. Confirm `SENDGRID_API_KEY` is supplied via `.env` (not committed to the repo).
 3. Deploy with git, so the server matches GitHub again and is not hand-edited.
