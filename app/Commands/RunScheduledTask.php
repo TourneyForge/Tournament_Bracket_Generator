@@ -186,7 +186,16 @@ class RunScheduledTask extends BaseCommand
         foreach ($tournaments as $tournament) {
             if(time() - strtotime($tournament['created_at']) > 86400){
                 /** Remove expired temp tournaments from cookie value */
-                $tournamentLibrary->deleteTournament($tournament['id']);
+                // Isolate each deletion so one bad row (e.g. a missing asset)
+                // cannot abort the whole scheduled run and block the rest.
+                try {
+                    $tournamentLibrary->deleteTournament($tournament['id']);
+                } catch (\Throwable $e) {
+                    log_message('error', 'Failed to delete expired guest tournament {id}: {msg}', [
+                        'id'  => $tournament['id'],
+                        'msg' => $e->getMessage(),
+                    ]);
+                }
             }
         }
 
