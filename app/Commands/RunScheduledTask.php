@@ -182,9 +182,11 @@ class RunScheduledTask extends BaseCommand
         /** Remove expired tournaments */
         $tournamentLibrary = new \App\Libraries\TournamentLibrary();
 
+        // Guest (user_id = 0) tournaments are kept for 120 days, then removed.
+        $guestTournamentTtl = 120 * 86400; // 120 days, in seconds
         $tournaments = $tournamentsModel->where(['user_id' => 0])->findAll();
         foreach ($tournaments as $tournament) {
-            if(time() - strtotime($tournament['created_at']) > 86400){
+            if(time() - strtotime($tournament['created_at']) > $guestTournamentTtl){
                 /** Remove expired temp tournaments from cookie value */
                 // Isolate each deletion so one bad row (e.g. a missing asset)
                 // cannot abort the whole scheduled run and block the rest.

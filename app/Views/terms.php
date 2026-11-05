@@ -30,7 +30,7 @@
 
             <p class="mt-3"><strong>3. Creating and Managing Tournaments</strong></p>
             <p class="mb-1 ps-2">✔ You can create and manage tournaments for free, with or without signing up.</p>
-            <p class="mb-1 ps-2">✔ Guest-created tournaments will be <strong>automatically deleted after 24 hours</strong> unless linked to a registered account.</p>
+            <p class="mb-1 ps-2">✔ Guest-created tournaments will be <strong>automatically deleted after 120 days</strong> unless linked to a registered account.</p>
             <p class="mb-1 ps-2">✔ As a tournament creator, you are responsible for managing participants, ensuring fairness, and maintaining compliance with these Terms.</p>
 
             <p class="mt-3"><strong>4. User Accounts and Responsibilities</strong></p>
@@ -60,7 +60,7 @@
 
             <p class="mb-1 ps-2"><strong>Data Retention & Deletion:</strong></p>
             <p class="mb-0 ps-3">• Registered user account data (including email, name, and tournaments you create) is retained until you delete your account or we remove it.</p>
-            <p class="mb-0 ps-3">• Guest-created tournaments are automatically deleted after 24 hours unless claimed by a registered account.</p>
+            <p class="mb-0 ps-3">• Guest-created tournaments are automatically deleted after 120 days unless claimed by a registered account.</p>
             <p class="mb-0 ps-3">• When you request account deletion (via Profile Settings &gt; Close Account), your account and associated personal data will be removed from active systems immediately. Backups or logs may contain residual data for operational recovery up to a certain period of time.</p>
             <p class="mb-1 ps-2">When you request deletion, a confirmation email will be sent attesting to the completion of the deletion process.</p>
 
