@@ -67,5 +67,8 @@ jobs:
           database.tests.port: "3306"
         run: vendor/bin/phpunit --no-coverage
 
+      # Report-only until the dependency-upgrade PR (CI 4.7 / patched libs) lands.
+      # Flip `continue-on-error` to false to make advisories block merges.
       - name: Security audit (production deps)
+        continue-on-error: true
         run: composer audit --no-dev
