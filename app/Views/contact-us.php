@@ -93,7 +93,7 @@
                             </h5>
                             <div id="explainGuestMode" class="accordion-collapse collapse p-3" data-bs-parent="#faqItems">
                                 <p class="ps-2">Absolutely! You can create and manage tournaments as a guest with <strong>no restrictions</strong> — except for one:</p>
-                                <p class="ps-2">To prevent spam, guest-created tournaments are <strong>automatically deleted after 24 hours</strong>.</p>
+                                <p class="ps-2">To prevent spam, guest-created tournaments are <strong>automatically deleted after 120 days</strong>.</p>
                                 <p class="ps-2">If you’d like to keep your tournament beyond this period, simply <a href="<?= base_url('register') ?>">Sign up</a> or <a href="<?= base_url('login') ?>">Log in</a> to claim and preserve it!</p>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                                 </button>
                             </h5>
                             <div id="explainReservation" class="accordion-collapse collapse p-3" data-bs-parent="#faqItems">
-                                <p class="ps-2">Unfortunately, guest tournaments are tied to the current browser session. If you close the tab and youre using your browser as something like incognito/private mode, your tournament will be unclaimed and automatically <strong>deleted after 24 hours</strong>!</p>
+                                <p class="ps-2">Unfortunately, guest tournaments are tied to the current browser session. If you close the tab and youre using your browser as something like incognito/private mode, your tournament will be unclaimed and automatically <strong>deleted after 120 days</strong>!</p>
                                 <p class="ps-2">If you want to retain full access, we recommend signing up/signing in before leaving your session. That way, your tournament is linked to your account and won’t be lost!</p>
                             </div>
                         </div>
