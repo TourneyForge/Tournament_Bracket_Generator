@@ -632,7 +632,7 @@ var changeVoteDisplayingMode = (element) => {
                 <br>
                 If you didn't enable visibility setting in the tournament properties and would like to preserve the tournament and its progress, please Signup/Login and unlock much more features (such as controlling availability, visibility, sharing and audio settings and more!) from your very own dedicated Tournament Dashboard available for registered users!
                 <br>
-                Note: Unaffiliated tournaments, meaning those created by unregistered visitors, will be deleted after 24 hours from the Tournament Gallery.
+                Note: Unaffiliated tournaments, meaning those created by unregistered visitors, will be deleted after 120 days from the Tournament Gallery.
                 <div class="text-center">
                     <?php if (!auth()->user()): ?><br>
                     <a href="<?= base_url('/login') ?>" class="btn btn-primary">Signup/Login to preserve tournament</a>
