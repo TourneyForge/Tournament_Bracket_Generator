@@ -1,0 +1,74 @@
+name: CI
+
+# Runs on every PR into main, and on pushes to non-main branches.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, test, audit
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: tests
+          MARIADB_USER: tests_user
+          MARIADB_PASSWORD: ""
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: intl, mbstring, mysqli, curl, gd, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer files
+        run: composer validate --no-check-publish --strict
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: PHP syntax lint (app/)
+        run: find app -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: Unit tests
+        env:
+          database.tests.hostname: 127.0.0.1
+          database.tests.database: tests
+          database.tests.username: tests_user
+          database.tests.password: ""
+          database.tests.DBDriver: MySQLi
+          database.tests.port: "3306"
+        run: vendor/bin/phpunit --no-coverage
+
+      # Report-only until the dependency-upgrade PR (CI 4.7 / patched libs) lands.
+      # Flip `continue-on-error` to false to make advisories block merges.
+      - name: Security audit (production deps)
+        continue-on-error: true
+        run: composer audit --no-dev

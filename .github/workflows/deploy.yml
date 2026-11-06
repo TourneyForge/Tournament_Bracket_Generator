@@ -1,0 +1,42 @@
+name: Deploy (production)
+
+# Merging to main queues a production deployment that WAITS for manual approval
+# (configure required reviewers on the "production" GitHub Environment).
+# You can also trigger a redeploy by hand from the Actions tab.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to tourneyforge.com
+    runs-on: ubuntu-latest
+    # The approval gate: the job pauses here until a required reviewer approves,
+    # as long as the "production" environment has required reviewers set.
+    environment:
+      name: production
+      url: https://tourneyforge.com/
+
+    steps:
+      - name: Deploy over SSH
+        # Pin to a commit SHA in production for supply-chain safety; tag shown for clarity.
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script_stop: true
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+            cd /home/tourneyforge/web/tourneyforge.com/public_html/Tournament_Bracket_Generator
+            bash scripts/deploy.sh
