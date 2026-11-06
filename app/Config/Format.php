@@ -61,4 +61,12 @@ class Format extends BaseConfig
         'application/xml'  => 0,
         'text/xml'         => 0,
     ];
+
+    /**
+     * Max. depth passed to json_encode()/json_decode().
+     *
+     * Added in CodeIgniter 4.7 (JSONFormatter reads $config->jsonEncodeDepth).
+     * Kept here so the upgraded framework finds it on this app's config.
+     */
+    public int $jsonEncodeDepth = 512;
 }
