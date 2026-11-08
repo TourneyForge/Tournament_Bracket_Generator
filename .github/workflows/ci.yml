@@ -21,7 +21,7 @@ jobs:
         env:
           MARIADB_DATABASE: tests
           MARIADB_USER: tests_user
-          MARIADB_PASSWORD: ""
+          MARIADB_PASSWORD: tests_pass
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
         ports:
           - 3306:3306
@@ -62,7 +62,7 @@ jobs:
           database.tests.hostname: 127.0.0.1
           database.tests.database: tests
           database.tests.username: tests_user
-          database.tests.password: ""
+          database.tests.password: tests_pass
           database.tests.DBDriver: MySQLi
           database.tests.port: "3306"
         run: vendor/bin/phpunit --no-coverage
